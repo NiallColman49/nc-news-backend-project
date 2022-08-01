@@ -1,8 +1,8 @@
 In order to access the necessary environment variables, please create the following 2 .env files. These are essential when configuring your settings:
 
-1. .env.development and run PGDATABASE=nc_news in this file
+1. .env.development - PGDATABASE=nc_news in this file
 
-2. .env.test and run PGDATABASE=nc_news_test in this file
+2. .env.test - PGDATABASE=nc_news_test in this file
 
 Then run the npm command npm install dotenv --save
 
