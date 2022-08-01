@@ -19,7 +19,6 @@ describe("GET /api/items", () => {
         const { topics } = body;
         expect(topics).toBeInstanceOf(Array);
         expect(topics).toHaveLength(3);
-        console.log("I am in the test");
         topics.forEach((topic) => {
           expect(topic).toEqual(
             expect.objectContaining({
