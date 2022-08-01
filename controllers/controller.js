@@ -8,6 +8,6 @@ exports.getAllTopics = (req, res) => {
       res.status(200).send({ topics });
     })
     .catch((err) => {
-      console.log(err);
+      return (err);
     });
 };
