@@ -4,8 +4,8 @@ const { pullAllTopics, pullArticleById } = require("../models/models");
 
 exports.getAllTopics = async (req, res, next) => {
   try {
-    const allTopics = await pullAllTopics();
-    res.status(200).send({ allTopics });
+    const topics = await pullAllTopics();
+    res.status(200).send({ topics });
   } catch (err) {
     next(err);
   }
