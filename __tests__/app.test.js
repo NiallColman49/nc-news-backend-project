@@ -205,3 +205,36 @@ describe("GET /api/articles", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("should return an array containing comments for given id", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual({
+          comment_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+        });
+      });
+  });
+  test("status: 400, responds with an error message when a bad request is passed", () => {
+    return request(app)
+      .get("/api/articles/incorrect/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("This is an invalid url");
+      });
+  });
+  test("status: 404, responds with an error message when passed an article ID that does not exist", () => {
+    return request(app)
+      .get("/api/articles/999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("No comments found");
+      });
+  });
+});

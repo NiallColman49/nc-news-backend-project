@@ -54,3 +54,14 @@ exports.pullAllArticles = async () => {
   }
   return result.rows;
 };
+
+exports.getArticleComments = async (id) => {
+  const result = await db.query(
+    `SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id= $1`,
+    [id]
+  );
+  if (!result.rows.length) {
+    return Promise.reject({ status: 404, msg: "No comments found" });
+  }
+  return result.rows[0];
+};

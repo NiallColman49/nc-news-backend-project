@@ -4,6 +4,7 @@ const {
   patchArticleUsingId,
   pullAllUsers,
   pullAllArticles,
+  getArticleComments,
 } = require("../models/models");
 
 exports.getAllTopics = async (req, res, next) => {
@@ -49,6 +50,16 @@ exports.getAllArticles = async (req, res, next) => {
   try {
     const allArticles = await pullAllArticles();
     res.status(200).send({ allArticles });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getArticleComment = async (req, res, next) => {
+  try {
+    const id = req.params.article_id;
+    const articleComments = await getArticleComments(id);
+    res.status(200).send({ comments: articleComments });
   } catch (err) {
     next(err);
   }
