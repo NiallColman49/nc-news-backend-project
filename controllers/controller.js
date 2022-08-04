@@ -1,10 +1,9 @@
-// controller is sending the client data to the model - controls traffic
-
 const {
   pullAllTopics,
   pullArticleById,
   patchArticleUsingId,
   pullAllUsers,
+  pullAllArticles,
 } = require("../models/models");
 
 exports.getAllTopics = async (req, res, next) => {
@@ -30,17 +29,26 @@ exports.patchArticlebyId = async (req, res, next) => {
   try {
     const article_id = req.params.article_id;
     const votes = req.body.inc_votes;
-    const patcher = await patchArticleUsingId(article_id, votes);
-    res.status(200).send({ article: patcher });
+    const patchArticle = await patchArticleUsingId(article_id, votes);
+    res.status(200).send({ article: patchArticle });
   } catch (err) {
     next(err);
   }
 };
 
-exports.getAllUsers = async (rec, res, next) => {
+exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await pullAllUsers();
     res.status(200).send({ users });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getAllArticles = async (req, res, next) => {
+  try {
+    const allArticles = await pullAllArticles();
+    res.status(200).send({ allArticles });
   } catch (err) {
     next(err);
   }

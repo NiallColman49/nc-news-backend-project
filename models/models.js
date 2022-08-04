@@ -1,9 +1,4 @@
-//accessing the data from nc_news
-
 const db = require("../db/connection.js");
-const articles = require("../db/data/test-data/articles.js");
-const users = require("../db/data/test-data/users.js");
-const checkExists = require("../models/utils");
 
 exports.pullAllTopics = async () => {
   const result = await db.query("SELECT * FROM topics;");
@@ -15,7 +10,11 @@ exports.pullAllTopics = async () => {
 
 exports.pullArticleById = async (id) => {
   const result = await db.query(
-    "SELECT * FROM articles WHERE article_id =$1;",
+    `SELECT articles.article_id, articles.author, title, articles.body, topic, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count 
+    FROM articles 
+    LEFT JOIN comments ON articles.article_id = comments.article_id 
+    WHERE articles.article_id = $1
+    GROUP BY articles.article_id`,
     [id]
   );
   if (!result.rows.length) {
@@ -37,6 +36,19 @@ exports.patchArticleUsingId = async (id, vote_number) => {
 
 exports.pullAllUsers = async () => {
   const result = await db.query("SELECT * FROM users;");
+  if (!result.rows.length) {
+    return Promise.reject({ status: 404, msg: "Users not found" });
+  }
+  return result.rows;
+};
+
+exports.pullAllArticles = async () => {
+  const result =
+    await db.query(`SELECT articles.article_id, articles.author, title, articles.body, topic, articles.created_at, articles.votes, COUNT(comment_id) AS comment_count 
+    FROM articles 
+    LEFT JOIN comments ON articles.article_id = comments.article_id 
+    GROUP BY articles.article_id
+    ORDER BY created_at DESC`);
   if (!result.rows.length) {
     return Promise.reject({ status: 404, msg: "Users not found" });
   }
