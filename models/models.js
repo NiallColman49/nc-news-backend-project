@@ -1,4 +1,5 @@
 const db = require("../db/connection.js");
+const { checkExists } = require("./utils");
 
 exports.pullAllTopics = async () => {
   const result = await db.query("SELECT * FROM topics;");
@@ -18,7 +19,7 @@ exports.pullArticleById = async (id) => {
     [id]
   );
   if (!result.rows.length) {
-    return Promise.reject({ status: 404, msg: "Article not found" });
+    return Promise.reject({ status: 404, msg: "Nothing found" });
   }
   return result.rows[0];
 };
@@ -29,7 +30,7 @@ exports.patchArticleUsingId = async (id, vote_number) => {
     [vote_number, id]
   );
   if (!result.rows.length) {
-    return Promise.reject({ status: 404, msg: "Article not found" });
+    return Promise.reject({ status: 404, msg: "Nothing found" });
   }
   return result.rows[0];
 };
@@ -53,4 +54,35 @@ exports.pullAllArticles = async () => {
     return Promise.reject({ status: 404, msg: "Users not found" });
   }
   return result.rows;
+};
+
+exports.getArticleComments = async (id) => {
+  await checkExists("articles", "article_id", id);
+
+  const result = await db.query(
+    `SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id= $1`,
+    [id]
+  );
+  return result.rows;
+};
+
+exports.postArticleComment = async (comment, id) => {
+  await checkExists("articles", "article_id", id);
+
+  const { username, body } = comment;
+  const result = await db.query(
+    `INSERT INTO comments 
+    (author, body, article_id) 
+    VALUES 
+    ($1, $2, $3) 
+    RETURNING *;`,
+    [username, body, id]
+  );
+  if (!result.rows.length) {
+    return Promise.reject({
+      status: 404,
+      msg: "No comments found to be added",
+    });
+  }
+  return result.rows[0];
 };
