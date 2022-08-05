@@ -7,8 +7,6 @@ const {
   patchArticlebyId,
   getAllUsers,
   getAllArticles,
-  getArticleComment,
-  postComment,
 } = require("./controllers/controller");
 
 app.use(express.json());
@@ -20,15 +18,13 @@ app.get("/api/topics", getAllTopics);
 app.get("/api/articles/:article_id", getArticleById);
 app.patch("/api/articles/:article_id", patchArticlebyId);
 app.get("/api/articles", getAllArticles);
-app.get("/api/articles/:article_id/comments", getArticleComment);
-app.post("/api/articles/:article_id/comments", postComment);
 
 //users
 app.get("/api/users", getAllUsers);
 
 //error handling
 app.use((err, req, res, next) => {
-  if (err.code === "22P02" || err.code === "23502") {
+  if (err.code === "22P02") {
     res.status(400).send({ msg: "This is an invalid url" });
   } else {
     next(err);
