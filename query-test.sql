@@ -1,6 +1,6 @@
 \c nc_news_test
 
--- SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id =
+SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id = 5;
 
 SELECT * FROM articles *;
 
@@ -17,3 +17,5 @@ SELECT articles.article_id, articles.author, title, articles.body, topic, articl
     ORDER BY articles.article_id ASC;
 
 SELECT comment_id, votes, created_at, author, body FROM comments WHERE article_id= 3;
+
+SELECT * FROM articles WHERE article_id = 4;
