@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
+require("jest-sorted");
 
 afterAll(() => {
   if (db.end) {
@@ -176,7 +177,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        const { allArticles } = body;
+        const allArticles = body;
         allArticles.forEach((article) => {
           expect(article).toEqual(
             expect.objectContaining({
@@ -198,7 +199,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
-        const { allArticles } = body;
+        const allArticles = body;
         expect(allArticles).toBeSortedBy("created_at", {
           descending: true,
         });
@@ -293,5 +294,73 @@ describe("POST /api/articles/:article_id/comments", () => {
       .then(({ body }) => {
         expect(body.msg).toBe("Nothing found");
       });
+  });
+
+  describe("11. GET /api/articles (queries)", () => {
+    test("sorts the response by default created_at when no sort_by defined in request ", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const articles = body;
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+    test("sorts the response by votes ", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
+        .then(({ body }) => {
+          const articles = body;
+          expect(articles).toBeSortedBy("votes", { descending: true });
+        });
+    });
+    test("sorts the response by a articles feild and requested order ", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order_by=ASC")
+        .expect(200)
+        .then(({ body }) => {
+          const articles = body;
+          expect(articles).toBeSortedBy("title", { descending: false });
+        });
+    });
+    test("sorts the response by a articles feild, requested order and filters by requeted topic ", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order_by=ASC&topic=cats")
+        .expect(200)
+        .then(({ body }) => {
+          const articles = body;
+          expect(articles).toBeSortedBy("title", { descending: false });
+          articles.forEach((article) => {
+            expect(article.topic).toEqual("cats");
+          });
+        });
+    });
+    test("returns all topics if no topics requested ", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order_by=ASC")
+        .expect(200)
+        .then(({ body }) => {
+          const articles = body;
+          expect(articles).toBeSortedBy("title", { descending: false });
+          expect(articles).toHaveLength(12);
+        });
+    });
+    test("returns error if order_by is not valid", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes&order_by=Aggg&topic=spaceman")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+    test("returns error if sort_by is not valid", () => {
+      return request(app)
+        .get("/api/articles?sort_by=badger&order_by=ASC&topic=spaceman")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
   });
 });
