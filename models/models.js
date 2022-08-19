@@ -86,3 +86,34 @@ exports.postArticleComment = async (comment, id) => {
   }
   return result.rows[0];
 };
+
+exports.selectQuery = (sortBy = `created_at`, orderBy = `DESC`, topic) => {
+  const validSortBy = [
+    "author",
+    "title",
+    "body",
+    "topic",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+  const validOrderBy = ["ASC", "DESC"];
+  if (!validSortBy.includes(sortBy) || !validOrderBy.includes(orderBy)) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+  let queryStr =
+    "SELECT articles.*, COUNT(comment_id) AS comment_count FROM articles LEFT JOIN comments ON comments.article_id = articles.article_id ";
+  if (topic) {
+    queryStr += `WHERE articles.topic = $1 GROUP BY articles.article_id ORDER BY ${sortBy} ${orderBy};`; //attaching where statement to original query with group by and order by
+    return db.query(queryStr, [topic]).then(({ rows }) => {
+      const article = rows;
+      return article;
+    });
+  } else {
+    queryStr += `GROUP BY articles.article_id ORDER BY ${sortBy} ${orderBy};`;
+    return db.query(queryStr).then(({ rows }) => {
+      const article = rows;
+      return article;
+    });
+  }
+};
