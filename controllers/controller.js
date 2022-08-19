@@ -6,6 +6,7 @@ const {
   pullAllArticles,
   getArticleComments,
   postArticleComment,
+  selectQuery,
 } = require("../models/models");
 
 exports.getAllTopics = async (req, res, next) => {
@@ -75,4 +76,15 @@ exports.postComment = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+exports.getQuery = (req, res, next) => {
+  const { sort_by } = req.query;
+  const { order_by } = req.query;
+  const { topic } = req.query;
+  selectQuery(sort_by, order_by, topic)
+    .then((articles) => {
+      res.status(200).send(articles);
+    })
+    .catch(next);
 };
