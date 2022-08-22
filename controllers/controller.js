@@ -9,7 +9,7 @@ const {
   selectQuery,
 } = require("../models/models");
 
-const endpoints = require("./endpoints.json");
+const endpoints = require("../endpoints.json");
 
 exports.getAllTopics = async (req, res, next) => {
   try {
