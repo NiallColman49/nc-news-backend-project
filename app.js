@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 
 const {
   getAllTopics,
@@ -9,8 +10,10 @@ const {
   getArticleComment,
   postComment,
   getQuery,
+  getApi,
 } = require("./controllers/controller");
 
+app.use(cors());
 app.use(express.json());
 
 //topics
@@ -22,6 +25,7 @@ app.patch("/api/articles/:article_id", patchArticlebyId);
 app.get("/api/articles/:article_id/comments", getArticleComment);
 app.post("/api/articles/:article_id/comments", postComment);
 app.get("/api/articles", getQuery);
+app.get("/api", getApi);
 
 //users
 app.get("/api/users", getAllUsers);

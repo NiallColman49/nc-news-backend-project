@@ -88,3 +88,7 @@ exports.getQuery = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getApi = (req, res) => {
+  res.status(200).send(endpoints);
+};
